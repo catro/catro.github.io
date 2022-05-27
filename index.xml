@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Catro的博客</title><link>https://catro.me/</link><description>Recent content on Catro的博客</description><generator>Hugo -- gohugo.io</generator><copyright>tocatro@gmail.com</copyright><lastBuildDate>Fri, 27 May 2022 14:04:08 +0000</lastBuildDate><atom:link href="https://catro.me/index.xml" rel="self" type="application/rss+xml"/><item><title>家庭网络环境</title><link>https://catro.me/post/20220527_home_lab/</link><pubDate>Fri, 27 May 2022 14:04:08 +0000</pubDate><guid>https://catro.me/post/20220527_home_lab/</guid><description>&lt;p>随着家庭的联网设备增加，自己对于网络要求的提升，一天天的折腾着家里网络的配置。在2016年的时候，我采用的方案是All in one，在一台&lt;a href="https://ark.intel.com/content/www/us/en/ark/products/91533/intel-celeron-processor-j3160-2m-cache-up-to-2-24-ghz.html">J3160&lt;/a>(8G)机器上安装了Win10(通过Kodi播放视频)，在Hyper-V跑pfSense(软路由)，黑群。在当时200兆宽带的情况下，这个配置使用下来基本够用。&lt;/p>
+&lt;h2 id="一分为二">一分为二&lt;/h2>
+&lt;p>到了2019年的时候，公司淘汰了一台&lt;a href="https://ark.intel.com/content/www/us/en/ark/products/88196/intel-core-i76700-processor-8m-cache-up-to-4-00-ghz.html">i6700&lt;/a>(16G)的机器，为了发挥它的余热就把J3160替换了下来。由于J3160不再需要跑Win10了，所以就直接把黑群装在物理机上。i6700则是代替J3160安装了Win10用于播放视频，继续在Hyper-V中跑pfSense。后来家里安装了一些Sonoff的智能开关，刷的&lt;a href="https://tasmota.github.io/docs/">Tasmota&lt;/a>固件，于是在Hyper-V中又安装了&lt;a href="https://www.home-assistant.io/">Home Assistant&lt;/a>。为了在电视盒子上方便的看Youtube, 于是又安装了OpenWRT作为旁路由。作为一名程序员，多多少少是需要部署几个docker的。再加上对Linux平台的开发需求，这台i6700上就跑了这些系统。&lt;/p>
+&lt;ul>
+&lt;li>Win10&lt;/li>
+&lt;li>pfSense&lt;/li>
+&lt;li>OpenWRT&lt;/li>
+&lt;li>Home Assistant&lt;/li>
+&lt;li>Ubuntu 20.04 (docker)&lt;/li>
+&lt;li>Proxmox VE + LXC (套娃形式快速创建不同系统)&lt;/li>
+&lt;/ul>
+&lt;h2 id="更换主系统">更换主系统&lt;/h2>
+&lt;p>久而久之，对这套系统产生了各种点点滴滴的不满意。这些问题仔细想想也没多大问题，可能是爱折腾的心让我最终选择了更换主系统。&lt;/p>
+&lt;ul>
+&lt;li>Win10的自动更新策略导致一个月至少重启一次&lt;/li>
+&lt;li>16G的内存偶尔会爆满导致部分虚拟机无法开启，不得不手动重启主机&lt;/li>
+&lt;li>入了Apple TV后几乎没再使用Kodi播放视频&lt;/li>
+&lt;li>下载的时候会使一个核的使用率达到100%，即使网速还没达到千兆&lt;/li>
+&lt;li>心水Proxmox VE的LXC，然而因为可用的内存有限所以一直没机会深入折腾&lt;/li>
+&lt;/ul>
+&lt;p>新的主系统选用的是Proxmox VE，原因是在Hyper-V里已经安装使用过一段时间比较熟悉了，所以没再尝试Esxi和Unraid。自从更换系统以来已经有一个多月，反反复复折腾了各种系统，最终稳定下来后家庭的网络环境如下图，后续再慢慢记录中间的折腾过程吧。
+&lt;img src="https://catro.me/img/homelab.svg" alt="homelab">&lt;/p></description></item><item><title>使用PN532复制IC卡</title><link>https://catro.me/post/20190225_duplicate_ic_card/</link><pubDate>Mon, 25 Feb 2019 20:19:15 +0800</pubDate><guid>https://catro.me/post/20190225_duplicate_ic_card/</guid><description>&lt;p>本文介绍复制IC卡所需要的硬件和软件，复制过程中遇到的一些问题以及解决方案。其中并不涉及IC卡存储格式或通信协议，需要了解请搜索相关资料。复制的IC卡可以置于手机及手机壳之间以达到近似于手机刷卡的效果。&lt;/p>
+&lt;p>&lt;strong>硬件列表&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://item.taobao.com/item.htm?spm=a1z09.2.0.0.257e2e8dSC4aqf&amp;amp;id=45375592400&amp;amp;_u=r1ra87b1636a">PN532模块&lt;/a>: 读写IC卡，支持Mifare 1K等卡片。&lt;/li>
+&lt;li>&lt;a href="https://detail.tmall.com/item.htm?id=537486291440&amp;amp;spm=a1z09.2.0.0.257e2e8dSC4aqf&amp;amp;_u=r1ra87b1f0fe">USB转TTL&lt;/a>：链接电脑和PN532模块。&lt;/li>
+&lt;li>&lt;a href="https://item.taobao.com/item.htm?spm=a1z09.2.0.0.257e2e8dSC4aqf&amp;amp;id=549885669295&amp;amp;_u=r1ra87b1db65">IC/ID二合一卡&lt;/a>：IC卡可以更改UID，ID卡为T5577类型。下一篇会介绍如何复制ID卡。&lt;/li>
+&lt;li>&lt;a href="https://item.taobao.com/item.htm?spm=a1z09.2.0.0.257e2e8dSC4aqf&amp;amp;id=549885669295&amp;amp;_u=r1ra87b1db65">消磁贴（可选）&lt;/a>：复制卡贴在手机后需要使用，否则读卡器无法识别。&lt;/li>
+&lt;/ul>
+&lt;p>PN532模块需要焊接4个引脚，然后将TTL线按图进行连接：
+&lt;img src="https://catro.me/img/PN532.jpg" alt="PN532连接图">&lt;/p>
+&lt;p>&lt;strong>软件列表&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>libusb: &lt;a href="http://libusb.sf.net/">http://libusb.sf.net&lt;/a>&lt;/li>
+&lt;li>libnfc: &lt;a href="https://github.com/nfc-tools/libnfc">https://github.com/nfc-tools/libnfc&lt;/a>&lt;/li>
+&lt;li>mfoc: &lt;a href="https://github.com/nfc-tools/mfoc">https://github.com/nfc-tools/mfoc&lt;/a>&lt;/li>
+&lt;li>mfcuk: &lt;a href="https://github.com/nfc-tools/mfcuk">https://github.com/nfc-tools/mfcuk&lt;/a> 最终本人使用的是另外分支，详见复制过程。&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Linux下安装过程&lt;/strong>&lt;/p>
+&lt;p>libusb: Ubuntu用户可以直接从源中安装: &lt;code>sudo apt install libusb-1.0-0-dev&lt;/code>.
+libnfc包含NFC驱动以及一些工具，根据说明文档编译安装。这里使用的是PN532模块，因此在配置的时候需要稍作修改，将对应的模块驱动编译进去。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">./configure --with-drivers=pn532_uart --enable-serial-autoprobe --prefix=/usr --sysconfdir=/etc
+make
+sudo make install
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>然后是创建配置文件，假定USB转TTL的设备文件路径为&lt;code>/dev/ttyUSB0&lt;/code>。如果Ubuntu用户找不到&lt;code>/dev/ttyUSB*&lt;/code>，可以安装尝试从源中安装&lt;code>linux-image-extra-virtual&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">sudo mkdir /etc/nfc
+sudo cp libnfc.conf.sample /etc/nfc/libnfc.conf
+sudo mkdir -p /etc/nfc/devices.d
+printf &amp;#39;name = &amp;#34;PN532&amp;#34;\nconnstring = &amp;#34;pn532_uart:/dev/ttyUSB0&amp;#34;\n&amp;#39; | sudo tee /etc/nfc/devices.d/pn532.conf
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>安装完libnfc后将需要复制的IC卡放到PN532模块上，然后读取该IC卡的UID。如果无法读取到UID根据输出信息进行调整。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">LIBNFC_LOG_LEVEL=3 nfc-list -v
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>mfoc和mfcuk是用来破解IC卡密码的两种工具，根据说明文档进行编译安装。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">autoreconf -is
+./configure
+make &amp;amp;&amp;amp; sudo make install
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>复制过程&lt;/strong>&lt;/p>
+&lt;p>首先用mfcuk进行密码破解：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">mfcuk -C -R 0:A -v 2
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>这里本人遇到了个问题，软件一直报错：&lt;code>mfcuk_key_recovery_block() (error code=0x03)&lt;/code>。经过一番搜索，发现&lt;a href="https://github.com/nfc-tools/mfcuk/issues/28">issue-28&lt;/a>里面有针对这个问题的讨论，解决这个问题的补丁被提交到了另外一个分支：&lt;a href="https://github.com/DrSchottky/mfcuk">https://github.com/DrSchottky/mfcuk&lt;/a>。所以本人又重新下载编译安装了这个分支的mfcuk。最终命令行下多了个参数&lt;code>-w 6&lt;/code>，&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">mfcuk -C -R 0:A -v 2 -w 6
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果IC卡的密码较简单的话一分钟左右就可以破解出来。&lt;/p>
+&lt;p>然后用mfoc将整张IC卡内容读出：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">mfoc -k ${KEY0} [-k ${KEY1}...] -O original.dmp
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果前面mfcuk没有成功破解密码的话也可以尝试用mfoc破解：&lt;code>mfoc -O original.dmp&lt;/code>。&lt;/p>
+&lt;p>最后将IC卡内容写入空白卡：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">nfc-mfclassic W a original.dmp original.dmp
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;strong>验证&lt;/strong>&lt;/p>
+&lt;p>最直接的方法当然是去门禁刷卡处验证了。但是不方便的情况下可以读取复制卡的内容，然后比较复制卡和原始卡内容是否一致。&lt;/p>
+&lt;p>&lt;strong>最终效果图&lt;/strong>&lt;/p>
+&lt;p>放置在手机背面，带上手机壳以后基本上感觉不到&lt;/p>
+&lt;p>&lt;img src="https://catro.me/img/phone_back.jpg" alt="phone_back">
+&lt;img src="https://catro.me/img/phone_back_with_cover.jpg" alt="phone_back_with_cover">&lt;/p></description></item><item><title>技能树小结</title><link>https://catro.me/post/20190203_skills/</link><pubDate>Sun, 03 Feb 2019 08:49:57 +0800</pubDate><guid>https://catro.me/post/20190203_skills/</guid><description>&lt;p>一直以来都想总结下，在这工作7年里学到了什么。最近通过思维导图的方式绘制出来。在这7年里，从最初的TCP/IP协议栈开始，慢慢的接触公司的各种产品。&lt;/p>
+&lt;p>&lt;img src="https://catro.me/img/skills.svg" alt="Skills">&lt;/p></description></item><item><title>使用多个WAN IPv4地址</title><link>https://catro.me/post/20190103_multiple_wan_ips/</link><pubDate>Thu, 03 Jan 2019 21:30:51 +0800</pubDate><guid>https://catro.me/post/20190103_multiple_wan_ips/</guid><description>&lt;p>本文介绍一种网络使用情景：在一台PC上使用多个外网地址，并且可以允许应用程序指定外网地址。&lt;/p>
+&lt;p>&lt;strong>现有设备如下：&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>多个电信光猫，每个光猫都能获取独立的公网IP地址。&lt;/li>
+&lt;li>普通交换机一台，有无VLAN功能都行。&lt;/li>
+&lt;li>单网卡PC一台。操作系统选用ArchLinux。也可以用Windows做Host，虚拟机中安装ArchLinux。&lt;/li>
+&lt;/ol>
+&lt;p>&lt;strong>分析&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>有些路由带有多拨功能，如openwrt，因此可以使用多个外网地址。然而多拨后的路由通常只支持负载平衡或者带宽最大化，内网的应用程序无法指定外网地址。&lt;/li>
+&lt;li>PC只有一块网卡，因此所有光猫的LAN口都直接连接到交换机，再由交换机连接到PC网卡。&lt;/li>
+&lt;li>光猫默认开启了DHCP，但是所有光猫的LAN口都连接在一起，DHCP无法正常工作，所以需要用静态IP。&lt;/li>
+&lt;li>为了方便管理，每个光猫都设置一个独立的网段。在这里将光猫的地址设置为192.168.x.1/24，然后给PC设置多个IP地址192.168.x.2/24。&lt;/li>
+&lt;li>平常使用的路由表多是基于目标地址的。但是对于外网地址，路由表是用默认路由作为数据包的下一跳。那么在多个默认路由的情况下，只能使用基于源地址的路由表。&lt;/li>
+&lt;li>Windows的路由表不支持基于源地址的路由，因此选择Linux操作系统。本人尝试过Ubuntu Server 16.04但未成功，具体原因不清楚。最后选择了ArchLinux。&lt;/li>
+&lt;li>完成源地址路由后，用户就可以通过BSD Socket的bind()绑定源地址，这样不同的源地址就对应不同的外网地址。但对于不支持指定源地址的程序仍然无法实现，例如curl。&lt;/li>
+&lt;li>对于类似curl这种支持代理的程序，我们可以设置一个支持指定源地址的代理程序，通过不同的代理端口来区分不同的外网地址。&lt;/li>
+&lt;/ol>
+&lt;p>&lt;strong>网络拓扑结构如下图：&lt;/strong>
+&lt;img src="https://catro.me/img/Multi-WAN.svg" alt="Multi WAN">&lt;/p>
+&lt;p>&lt;strong>PC上的配置&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>ArchLinux的安装过程参见：&lt;a href="https://wiki.archlinux.org/index.php/Installation_guide">Installation guide&lt;/a>。Linux新手可以选择安装基于ArchLinux的&lt;a href="https://manjaro.org/">Manjaro&lt;/a>。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>基于&lt;a href="https://wiki.archlinux.org/index.php/Netctl">Netctl&lt;/a>设置静态IP。&lt;/p>
+&lt;p>配置文件：&lt;code>/etc/netctl/eth0&lt;/code>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="nv">Description&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;A basic static ethernet connection&amp;#39;&lt;/span>
+&lt;span class="nv">Interface&lt;/span>&lt;span class="o">=&lt;/span>eth0
+&lt;span class="nv">Connection&lt;/span>&lt;span class="o">=&lt;/span>ethernet
+&lt;span class="nv">IP&lt;/span>&lt;span class="o">=&lt;/span>static
+&lt;span class="nv">Address&lt;/span>&lt;span class="o">=(&lt;/span>&lt;span class="s1">&amp;#39;192.168.0.2/24&amp;#39;&lt;/span> &lt;span class="s1">&amp;#39;192.168.1.2/24&amp;#39;&lt;/span> &lt;span class="s1">&amp;#39;192.168.2.2/24&amp;#39;&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;span class="nv">Gateway&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;192.168.0.1&amp;#39;&lt;/span>
+&lt;span class="nv">DNS&lt;/span>&lt;span class="o">=(&lt;/span>&lt;span class="s1">&amp;#39;192.168.0.1&amp;#39;&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>应用设置： &lt;code>bash sudo netctl restart eth0&lt;/code>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>创建shell脚本来设置源路由:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="cp">#!/bin/sh
+&lt;/span>&lt;span class="cp">&lt;/span>&lt;span class="k">for&lt;/span> &lt;span class="o">((&lt;/span>&lt;span class="nv">i&lt;/span>&lt;span class="o">=&lt;/span>0&lt;span class="p">;&lt;/span> i&amp;lt;&lt;span class="o">=&lt;/span>2&lt;span class="p">;&lt;/span> i++&lt;span class="o">))&lt;/span>
+&lt;span class="k">do&lt;/span>
+&lt;span class="nv">tb&lt;/span>&lt;span class="o">=&lt;/span>1&lt;span class="nv">$i&lt;/span>
+ip route flush &lt;span class="nv">$tb&lt;/span>
+ip route add table &lt;span class="nv">$tb&lt;/span> to 192.168.&lt;span class="nv">$i&lt;/span>.0/24 dev eth0
+ip route add table &lt;span class="nv">$tb&lt;/span> to default via 192.168.&lt;span class="nv">$i&lt;/span>.1 dev eth0
+ip rule add from 192.168.&lt;span class="nv">$i&lt;/span>.0/24 table &lt;span class="nv">$tb&lt;/span> priority &lt;span class="nv">$tb&lt;/span>
+&lt;span class="k">done&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;li>
+&lt;p>用Apache HTTP Server作为代理，配置如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-apacheConf" data-lang="apacheConf">&lt;span class="nb">Listen&lt;/span> &lt;span class="m">10000&lt;/span>
+&lt;span class="nb">Listen&lt;/span> &lt;span class="m">10001&lt;/span>
+&lt;span class="nb">Listen&lt;/span> &lt;span class="m">10002&lt;/span>
+&lt;span class="nb">Listen&lt;/span> &lt;span class="m">10003&lt;/span>
+&lt;span class="nt">&amp;lt;VirtualHost&lt;/span> &lt;span class="s">*:10000&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="nb">ProxyRequests&lt;/span> &lt;span class="k">On&lt;/span>
+&lt;span class="nb">ProxyVia&lt;/span> &lt;span class="k">Off&lt;/span>
+&lt;span class="nb">ProxySourceAddress&lt;/span> &lt;span class="m">192.168.0.2&lt;/span>
+&lt;span class="nt">&amp;lt;/VirtualHost&amp;gt;&lt;/span>
+&lt;span class="nt">&amp;lt;VirtualHost&lt;/span> &lt;span class="s">*:10001&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="nb">ProxyRequests&lt;/span> &lt;span class="k">On&lt;/span>
+&lt;span class="nb">ProxyVia&lt;/span> &lt;span class="k">Off&lt;/span>
+&lt;span class="nb">ProxySourceAddress&lt;/span> &lt;span class="m">192.168.1.2&lt;/span>
+&lt;span class="nt">&amp;lt;/VirtualHost&amp;gt;&lt;/span>
+&lt;span class="nt">&amp;lt;VirtualHost&lt;/span> &lt;span class="s">*:10002&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="nb">ProxyRequests&lt;/span> &lt;span class="k">On&lt;/span>
+&lt;span class="nb">ProxyVia&lt;/span> &lt;span class="k">Off&lt;/span>
+&lt;span class="nb">ProxySourceAddress&lt;/span> &lt;span class="m">192.168.2.2&lt;/span>
+&lt;span class="nt">&amp;lt;/VirtualHost&amp;gt;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;/li>
+&lt;/ol>
+&lt;p>&lt;strong>验证&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-shell" data-lang="shell">$ curl -x localhost:10000 https://ip.cn
+当前 IP: 172.0.0.1
+$ curl -x localhost:10001 https://ip.cn
+当前 IP: 172.0.0.2
+$ curl -x localhost:10002 https://ip.cn
+当前 IP: 172.0.0.3
+&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div></description></item><item><title>你好Hugo</title><link>https://catro.me/post/20190101_hello_hugo/</link><pubDate>Tue, 01 Jan 2019 22:58:40 +0800</pubDate><guid>https://catro.me/post/20190101_hello_hugo/</guid><description>&lt;p>你好Hugo！你好2019年！&lt;/p></description></item></channel></rss>

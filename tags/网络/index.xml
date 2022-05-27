@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>网络 on Catro的博客</title><link>https://catro.me/tags/%E7%BD%91%E7%BB%9C/</link><description>Recent content in 网络 on Catro的博客</description><generator>Hugo -- gohugo.io</generator><copyright>tocatro@gmail.com</copyright><lastBuildDate>Fri, 27 May 2022 14:04:08 +0000</lastBuildDate><atom:link href="https://catro.me/tags/%E7%BD%91%E7%BB%9C/index.xml" rel="self" type="application/rss+xml"/><item><title>家庭网络环境</title><link>https://catro.me/post/20220527_home_lab/</link><pubDate>Fri, 27 May 2022 14:04:08 +0000</pubDate><guid>https://catro.me/post/20220527_home_lab/</guid><description>&lt;p>随着家庭的联网设备增加，自己对于网络要求的提升，一天天的折腾着家里网络的配置。在2016年的时候，我采用的方案是All in one，在一台&lt;a href="https://ark.intel.com/content/www/us/en/ark/products/91533/intel-celeron-processor-j3160-2m-cache-up-to-2-24-ghz.html">J3160&lt;/a>(8G)机器上安装了Win10(通过Kodi播放视频)，在Hyper-V跑pfSense(软路由)，黑群。在当时200兆宽带的情况下，这个配置使用下来基本够用。&lt;/p></description></item><item><title>使用多个WAN IPv4地址</title><link>https://catro.me/post/20190103_multiple_wan_ips/</link><pubDate>Thu, 03 Jan 2019 21:30:51 +0800</pubDate><guid>https://catro.me/post/20190103_multiple_wan_ips/</guid><description>&lt;p>本文介绍一种网络使用情景：在一台PC上使用多个外网地址，并且可以允许应用程序指定外网地址。&lt;/p>
+&lt;p>&lt;strong>现有设备如下：&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>多个电信光猫，每个光猫都能获取独立的公网IP地址。&lt;/li>
+&lt;li>普通交换机一台，有无VLAN功能都行。&lt;/li>
+&lt;li>单网卡PC一台。操作系统选用ArchLinux。也可以用Windows做Host，虚拟机中安装ArchLinux。&lt;/li>
+&lt;/ol></description></item></channel></rss>
