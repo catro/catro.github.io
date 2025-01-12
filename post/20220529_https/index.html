@@ -1,0 +1,445 @@
+<!doctype html><html lang=en itemscope itemtype=http://schema.org/WebPage>
+<head>
+<meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<title>在局域网中部署HTTPS - Catro的博客</title>
+<meta name=renderer content="webkit">
+<meta name=viewport content="width=device-width,initial-scale=1,user-scalable=yes">
+<meta name=MobileOptimized content="width">
+<meta name=HandheldFriendly content="true">
+<meta name=applicable-device content="pc,mobile">
+<meta name=theme-color content="#f8f5ec">
+<meta name=msapplication-navbutton-color content="#f8f5ec">
+<meta name=apple-mobile-web-app-capable content="yes">
+<meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec">
+<meta name=mobile-web-app-capable content="yes">
+<meta name=author content="Catro">
+<meta name=description content="HTTPS是指HTTP over TLS，主要是为了提升HTTP协议栈的安全性。众所周知，HTTP本身是基于TCP/IP，从浏览器到网站之间的数据都是通过明文传输。明文传输就可能存在数据被篡改以及隐私泄漏的风险。TLS通过证书认证，通信加密以及摘要算法保证了端到端之间的安全性。HTTPS已经被广泛的应用到了因特网上，如果访问的哪个网站没有启用HTTPS那么主流的浏览器就会给予用户提示潜在的风险。随着越来越多的智能设备接入到局域网中，局域网的网络安全往往是大家容易忽视的地方。
+">
+<meta name=generator content="Hugo 0.91.2">
+<link rel=canonical href=https://catro.me/post/20220529_https/>
+<link rel=icon href=/favicon.ico>
+<link rel=stylesheet href=/sass/jane.min.b3a8813c06e6d785beba22bf8264e174fa2cb3a396b22f9ba24e2c00c18aaf7f.css integrity="sha256-s6iBPAbm14W+uiK/gmThdPoss6OWsi+bok4sAMGKr38=" media=screen crossorigin=anonymous>
+<meta property="og:title" content="在局域网中部署HTTPS">
+<meta property="og:description" content="HTTPS是指HTTP over TLS，主要是为了提升HTTP协议栈的安全性。众所周知，HTTP本身是基于TCP/IP，从浏览器到网站之间的数据都是通过明文传输。明文传输就可能存在数据被篡改以及隐私泄漏的风险。TLS通过证书认证，通信加密以及摘要算法保证了端到端之间的安全性。HTTPS已经被广泛的应用到了因特网上，如果访问的哪个网站没有启用HTTPS那么主流的浏览器就会给予用户提示潜在的风险。随着越来越多的智能设备接入到局域网中，局域网的网络安全往往是大家容易忽视的地方。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://catro.me/post/20220529_https/"><meta property="article:section" content="post">
+<meta property="article:published_time" content="2022-05-29T14:40:11+00:00">
+<meta property="article:modified_time" content="2022-05-29T14:40:11+00:00">
+<meta itemprop=name content="在局域网中部署HTTPS">
+<meta itemprop=description content="HTTPS是指HTTP over TLS，主要是为了提升HTTP协议栈的安全性。众所周知，HTTP本身是基于TCP/IP，从浏览器到网站之间的数据都是通过明文传输。明文传输就可能存在数据被篡改以及隐私泄漏的风险。TLS通过证书认证，通信加密以及摘要算法保证了端到端之间的安全性。HTTPS已经被广泛的应用到了因特网上，如果访问的哪个网站没有启用HTTPS那么主流的浏览器就会给予用户提示潜在的风险。随着越来越多的智能设备接入到局域网中，局域网的网络安全往往是大家容易忽视的地方。"><meta itemprop=datePublished content="2022-05-29T14:40:11+00:00">
+<meta itemprop=dateModified content="2022-05-29T14:40:11+00:00">
+<meta itemprop=wordCount content="2636">
+<meta itemprop=keywords content="网络,配置,"><meta name=twitter:card content="summary">
+<meta name=twitter:title content="在局域网中部署HTTPS">
+<meta name=twitter:description content="HTTPS是指HTTP over TLS，主要是为了提升HTTP协议栈的安全性。众所周知，HTTP本身是基于TCP/IP，从浏览器到网站之间的数据都是通过明文传输。明文传输就可能存在数据被篡改以及隐私泄漏的风险。TLS通过证书认证，通信加密以及摘要算法保证了端到端之间的安全性。HTTPS已经被广泛的应用到了因特网上，如果访问的哪个网站没有启用HTTPS那么主流的浏览器就会给予用户提示潜在的风险。随着越来越多的智能设备接入到局域网中，局域网的网络安全往往是大家容易忽视的地方。"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]-->
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)},ga.l=+new Date,ga('create','UA-131675522-1','auto'),ga('send','pageview'))</script>
+<script async src=https://www.google-analytics.com/analytics.js></script>
+</head>
+<body>
+<div id=mobile-navbar class=mobile-navbar>
+<div class=mobile-header-logo>
+<a href=/ class=logo>Catro的博客</a>
+</div>
+<div class=mobile-navbar-icon>
+<span></span>
+<span></span>
+<span></span>
+</div>
+</div>
+<nav id=mobile-menu class="mobile-menu slideout-menu">
+<ul class=mobile-menu-list>
+<li class=mobile-menu-item>
+<a class=menu-item-link href=https://catro.me/>主页</a>
+</li><li class=mobile-menu-item>
+<a class=menu-item-link href=https://catro.me/post/>归档</a>
+</li><li class=mobile-menu-item>
+<a class=menu-item-link href=https://catro.me/tags/>标签</a>
+</li><li class=mobile-menu-item>
+<a class=menu-item-link href=https://catro.me/categories/>分类</a>
+</li>
+</ul>
+</nav>
+<header id=header class="header container">
+<div class=logo-wrapper>
+<a href=/ class=logo>
+Catro的博客
+</a>
+</div>
+<nav class=site-navbar>
+<ul id=menu class=menu>
+<li class=menu-item>
+<a class=menu-item-link href=https://catro.me/>主页</a>
+</li>
+<li class=menu-item>
+<a class=menu-item-link href=https://catro.me/post/>归档</a>
+</li>
+<li class=menu-item>
+<a class=menu-item-link href=https://catro.me/tags/>标签</a>
+</li>
+<li class=menu-item>
+<a class=menu-item-link href=https://catro.me/categories/>分类</a>
+</li>
+</ul>
+</nav>
+</header>
+<div id=mobile-panel>
+<main id=main class="main bg-llight">
+<div class=content-wrapper>
+<div id=content class="content container">
+<article class="post bg-white">
+<header class=post-header>
+<h1 class=post-title>在局域网中部署HTTPS</h1>
+<div class=post-meta>
+<time datetime=2022-05-29 class=post-time>
+2022-05-29
+</time>
+<div class=post-category>
+<a href=https://catro.me/categories/%E7%BD%91%E7%BB%9C/> 网络 </a>
+</div>
+<span id=busuanzi_container_page_pv>
+| 阅读 <span id=busuanzi_value_page_pv></span>
+</span>
+</div>
+</header>
+<div class=post-content>
+<p>HTTPS是指HTTP over TLS，主要是为了提升HTTP协议栈的安全性。众所周知，HTTP本身是基于TCP/IP，从浏览器到网站之间的数据都是通过明文传输。明文传输就可能存在数据被篡改以及隐私泄漏的风险。TLS通过证书认证，通信加密以及摘要算法保证了端到端之间的安全性。HTTPS已经被广泛的应用到了因特网上，如果访问的哪个网站没有启用HTTPS那么主流的浏览器就会给予用户提示潜在的风险。随着越来越多的智能设备接入到局域网中，局域网的网络安全往往是大家容易忽视的地方。</p>
+<h2 id=家庭网络分析>家庭网络分析</h2>
+<p>局域网中只要有任意设备上运行着不安全程序，那么直接访问局域网中部署的HTTP网站就可能被监听账号密码和隐私数据。在我的家庭网络中，很多服务都是需要通过Web来进行设置，那么启用全网站的HTTPS就上刻不容缓了。</p>
+<p>在上篇<a href=/post/20220527_home_lab/>文章</a>中已经介绍了我目前的网络配置，有这些服务是需要启用HTTPS的。</p>
+<ol>
+<li>Proxmox VE</li>
+<li>pfSense</li>
+<li>OpenWRT</li>
+<li>NAS</li>
+<li>Docker</li>
+<li>Web server Caddy</li>
+<li>Portainer</li>
+<li>Gitea</li>
+<li>Home Assistant</li>
+</ol>
+<p>启用HTTPS主要是需要申请以及部署服务器证书。对于这么多个站点，如果需要定时的手工申请和部署那肯定是不现实的。Docker里的几个服务器上可以通过Caddy进行方向代理。因为数据不会离开Docker环境，所以方向代理过程中发送的明文数据不会被局域网中其它设备监听到。所以最终就剩下5个服务器需要进行操作。目前最常见的自动化部署方案当属通过ACME申请和部署Let&rsquo;s encrypt的证书。这个方案在我的大部分服务中都有支持，但是我没有选择这个完整的方案，原因如下，</p>
+<ol>
+<li>这个方案需要拥有一个自己的域名。虽然我自己有不少域名，但是在局域网中还是希望能使用一个简短的域名(比如.lan)来方便内部访问。</li>
+<li>证书的有效期比较短，通常为三个月。之前尝试过使用正式运命，由于在部分服务上出现过没成功续签导致网站无法访问，所以还是希望能够有个至少一年的证书有效期。</li>
+<li>内部网站只能通过DNS挑战来签发证书，我并不希望所有的服务都能够有直接操作域名的权限。</li>
+</ol>
+<h2 id=寻找方案>寻找方案</h2>
+<p>既然使用了私有域名，那么就需要有自己的证书管理体系了。我最开始使用的是pfSense自带的证书管理软件，相比于网上那些直接使用openssl命令行来创建CA和签发证书要方便不少。自签证书为了减少证书到期后的部署问题，也是直接使用了10年有效期。然而随着苹果对证书的要求升级，超过一年的证书仍然会被提示证书日期问题，于是不得不再继续寻找其它方案。在网上搜索ACME服务器的时候发现了<a href=https://smallstep.com/>step ca</a>，支持<a href=https://github.com/acmesh-official/acme.sh>acme.sh</a>和<a href=https://caddyserver.com/>Caddy</a>自动部署，完全符合我的需求。</p>
+<h2 id=部署>部署</h2>
+<h3 id=step-ca>step ca</h3>
+<p>首先是在docker中部署step ca, 参考<a href=https://hub.docker.com/r/smallstep/step-ca>这里</a>的内容。默认情况下CA证书是由step ca产生，但是为了方便管理，我还是在pfSense中产生了一个CA并且导入到step ca中来使用。step ca的初始化分以下几步操作。</p>
+<ol>
+<li>初始化。这里我将证书<em>ca.crt</em>和<em>ca.key</em>放在了*/root/docker/step*目录下，根据提示输入并记下密码。</li>
+</ol>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-shell data-lang=shell>docker run -it -v step:/home/step -v /root/docker/step:/step smallstep/step-ca step ca init --root<span class=o>=</span>/step/ca.crt --key<span class=o>=</span>/step/ca.key
+</code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>保存密码已经更新配置。</li>
+</ol>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-shell data-lang=shell>docker run -it -v step:/home/step smallstep/step-ca sh
+</code></pre></td></tr></table>
+</div>
+</div><p>在容器中，将密码保存到指定位置。</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=nb>echo</span> -n <span class=s2>&#34;&lt;your password here&gt;&#34;</span> &gt; /home/step/secrets/password
+</code></pre></td></tr></table>
+</div>
+</div><p>在容器中，更新配置。</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-shell data-lang=shell>vi /home/step/config/ca.json
+</code></pre></td></tr></table>
+</div>
+</div><p>在<code>authority</code>下添加如下内容将默认的证书有效期从一天改为一年。</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-json data-lang=json>              <span class=s2>&#34;claims&#34;</span><span class=err>:</span><span class=p>{</span>                                                                                                                                                         
+                    <span class=nt>&#34;minTLSCertDuration&#34;</span><span class=p>:</span> <span class=s2>&#34;5m&#34;</span><span class=p>,</span>                                                                                                                                 
+                    <span class=nt>&#34;maxTLSCertDuration&#34;</span><span class=p>:</span> <span class=s2>&#34;8760h&#34;</span><span class=p>,</span>                                                                                                                              
+                    <span class=nt>&#34;defaultTLSCertDuration&#34;</span><span class=p>:</span> <span class=s2>&#34;8760h&#34;</span><span class=p>,</span>                                                                                                                          
+                    <span class=nt>&#34;disableRenewal&#34;</span><span class=p>:</span> <span class=kc>false</span><span class=p>,</span>                                                                                                                                    
+                    <span class=nt>&#34;minHostSSHCertDuration&#34;</span><span class=p>:</span> <span class=s2>&#34;5m&#34;</span><span class=p>,</span>                                                                                                                             
+                    <span class=nt>&#34;maxHostSSHCertDuration&#34;</span><span class=p>:</span> <span class=s2>&#34;1680h&#34;</span><span class=p>,</span>                                                                                                                          
+                    <span class=nt>&#34;defaultHostSSHCertDuration&#34;</span><span class=p>:</span> <span class=s2>&#34;720h&#34;</span><span class=p>,</span>                                                                                                                       
+                    <span class=nt>&#34;minUserSSHCertDuration&#34;</span><span class=p>:</span> <span class=s2>&#34;5m&#34;</span><span class=p>,</span>   
+                    <span class=nt>&#34;maxUserSSHCertDuration&#34;</span><span class=p>:</span> <span class=s2>&#34;24h&#34;</span><span class=p>,</span>     
+                    <span class=nt>&#34;defaultUserSSHCertDuration&#34;</span><span class=p>:</span> <span class=s2>&#34;16h&#34;</span>  
+              <span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>启动容器，以端口9000为例。</li>
+</ol>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-shell data-lang=shell>docker run -d -p 9000:9000 -v step:/home/step smallstep/step-ca
+</code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>将ca.crt安装到所有需要访问局域网内网站的设备上。</li>
+<li>这里以<strong>ca.lan</strong>做为域名，访问<a href=https://ca.lan:9000/health>https://ca.lan:9000/health</a>，安装正常的情况下可以在浏览器中看到如下内容，并且浏览器也不再报证书不可信问题了。</li>
+</ol>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=p>{</span><span class=nt>&#34;status&#34;</span><span class=p>:</span><span class=s2>&#34;ok&#34;</span><span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>step ca服务启动后，那么接下来就可以在各个网页服务器上启用ACME了。这里需要做两方面设置，</p>
+<ol>
+<li>让服务器信任ca.crt。</li>
+<li>设置ACME的directory为https://ca.lan:9000/acme/acme/directory</li>
+</ol>
+<h3 id=proxmox-ve-pve>Proxmox VE (pve)</h3>
+<ol>
+<li>让pve信任ca.crt。打开shell，创建目录'/usr/local/share/ca-certificates/my-custom-ca&rsquo;将证书放进去，执行<code>update-ca-certificates</code>即可。</li>
+<li>添加ACME账号。pve的网页上只能添加Let&rsquo;s Encrypt的ACME账号，可以通过<code>pvenode acme</code>指令来设置。打开shell，执行<code>pvenode acme account register default user@email.lan --directory https://ca.lan:9000/acme/acme/directory</code>。</li>
+<li>申请证书。打开shell，执行</li>
+</ol>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback>pvenode config set --acme domains=pve.lan
+pvenode acme cert order
+</code></pre></td></tr></table>
+</div>
+</div><p>看到如下输出就代表证书部署完成了，</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback>Loading ACME account details
+Placing ACME order
+...
+Status is &#39;valid&#39;!
+
+All domains validated!
+...
+Downloading certificate
+Setting pveproxy certificate and key
+Restarting pveproxy
+Task OK
+</code></pre></td></tr></table>
+</div>
+</div><h3 id=pfsense>pfSense</h3>
+<ol>
+<li>让pfSense信任ca.crt。打开shell，创建目录'/usr/local/etc/ssl/certs&rsquo;将证书放进去，执行<code>certctl rehash </code>即可。</li>
+<li>通过网页安装软件包acme。</li>
+<li>在shell里编辑'/usr/local/pkg/acme/acme.inc'，大概在172行左右，添加如下代码，根据pfSense版本不同，代码略微有点差异。
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback>$a_acmeserver[&#39;local&#39;] = [
+    &#39;name&#39; =&gt; &#34;acme.local&#34;,
+    &#39;url&#39; =&gt; &#39;https://ca.lan:9000/acme/acme/directory&#39;
+];
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>在shell里选11重启网页：<code>11) Restart webConfigurator</code>。</li>
+<li>在网页打开&rsquo;Service' -> &lsquo;Acme Certificates&rsquo;，选择&rsquo;Account Keys'，&lsquo;Add&rsquo;。&lsquo;ACME Server&rsquo;选&rsquo;acme.local&rsquo;。</li>
+<li>在网页打开&rsquo;Service' -> &lsquo;Acme Certificates&rsquo;，选择&rsquo;Certificates'，&lsquo;Add&rsquo;。完成后点&rsquo;Issue/Renew'，就可以看到签发的证书啦。</li>
+</ol>
+<h3 id=群晖>群晖</h3>
+<ol>
+<li>安装<a href=https://github.com/acmesh-official/acme.sh>acme.sh</a>。<code>curl https://get.acme.sh | sh -s email=my@example.com --force</code></li>
+<li>将ca.crt证书放置到'$HOME/.acme.sh/'。</li>
+<li>进入'$HOME/.acme.sh', 签发证书。<code>./acme.sh --issue -d nas.lan --ca-bundle ./ca.crt --server https://ca.lan:9000/acme/acme/directory --webroot /var/lib/letsencrypt --force</code></li>
+<li>设置本地部署。</li>
+</ol>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback>export SYNO_USE_TEMP_ADMIN=1
+./acme.sh --deploy --deploy-hook synology_dsm -d nas.lan
+</code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>在网页中创建定时任务，执行<code>/root/.acme.sh/acme.sh --cron --home /root/.acme.sh/</code></li>
+</ol>
+<h3 id=caddy>Caddy</h3>
+<ol>
+<li>将ca.crt放到Caddyfile配置所在目录。</li>
+<li>在Caddyfile最前面增加如下配置</li>
+</ol>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback>{
+  email my@example.com
+  acme_ca https://ca.lan:9000/acme/acme/directory
+  acme_ca_root /ca.crt
+}
+</code></pre></td></tr></table>
+</div>
+</div><ol>
+<li>反向代理本地HTTP服务</li>
+</ol>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback>home.lan {
+  reverse_proxy &lt;Host&gt;:&lt;Port&gt;
+}
+</code></pre></td></tr></table>
+</div>
+</div>
+</div>
+<div class=post-copyright>
+<p class=copyright-item>
+<span class=item-title>文章作者</span>
+<span class=item-content>Catro</span>
+</p>
+<p class=copyright-item>
+<span class=item-title>上次更新</span>
+<span class=item-content>
+2022-05-29
+</span>
+</p>
+<p class=copyright-item>
+<span class=item-title>许可协议</span>
+<span class=item-content><a rel="license noopener" href=https://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh target=_blank>CC BY-NC-ND 4.0</a></span>
+</p>
+</div>
+<footer class=post-footer>
+<div class=post-tags>
+<a href=https://catro.me/tags/%E7%BD%91%E7%BB%9C/>网络</a>
+<a href=https://catro.me/tags/%E9%85%8D%E7%BD%AE/>配置</a>
+</div>
+<nav class=post-nav>
+<a class=next href=/post/20220527_home_lab/>
+<span class="next-text nav-default">家庭网络环境</span>
+<span class="prev-text nav-mobile">下一篇</span>
+<i class=iconfont><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18" height="18"><path d="M332.091514 74.487481l-75.369571 89.491197c-10.963703 12.998035-10.285251 32.864502 1.499144 44.378743l286.278095 300.375162L266.565125 819.058374c-11.338233 12.190647-11.035334 32.285311.638543 44.850487l80.46666 86.564541c11.680017 12.583596 30.356378 12.893658 41.662889.716314l377.434212-421.426145c11.332093-12.183484 11.041474-32.266891-.657986-44.844348l-80.46666-86.564541c-1.772366-1.910513-3.706415-3.533476-5.750981-4.877077L373.270379 71.774697c-11.777231-11.500939-30.216186-10.304694-41.178865 2.712784z"/></svg>
+</i>
+</a>
+</nav>
+</footer>
+</article>
+<div class=disqus-comment>
+<div class=disqus-button id=load_disqus onclick=load_disqus()>
+显示 Disqus 评论
+</div>
+<div id=disqus_thread></div>
+<script type=text/javascript>var disqus_config=function(){this.page.url="https://catro.me/post/20220529_https/"};function load_disqus(){var a,b;if(window.location.hostname==='localhost')return;a=document.createElement('script'),a.type='text/javascript',a.async=!0,b='catro',a.src='//'+b+'.disqus.com/embed.js',(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(a),$('#load_disqus').remove()}</script>
+<noscript>Please enable JavaScript to view the
+<a href=http://disqus.com/?ref_noscript>comments powered by Disqus.</a>
+</noscript>
+</div>
+</div>
+</div>
+</main>
+<footer id=footer class=footer>
+<div class=icon-links>
+<a href=mailto:tocatro@gmail.com rel="me noopener" class=iconfont title=email><svg class="icon" viewBox="0 0 1451 1024" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="36" height="36"><path d="M664.781909 681.472759.0 97.881301C0 3.997201 71.046997.0 71.046997.0H474.477909 961.649408h399.992405s71.046998 3.997201 71.046998 97.881301L771.345323 681.472759S764.482731 685.154773 753.594283 688.65053V688.664858C741.602731 693.493018 729.424896 695.068979 718.077952 694.839748 706.731093 695.068979 694.553173 693.493018 682.561621 688.664858V688.65053C671.644501 685.140446 664.781909 681.472759 664.781909 681.472759zm53.281707 130.131124C693.779541 811.016482 658.879232 802.205449 619.10784 767.734955 542.989056 701.759633.0 212.052267.0 212.052267V942.809523S0 1024 83.726336 1024H682.532949 753.579947h595.368192C1432.688811 1024 1432.688811 942.809523 1432.688811 942.809523V212.052267S893.138176 701.759633 817.019477 767.734955c-39.771477 34.470494-74.671786 43.295855-98.955861 43.868928z"/></svg>
+</a>
+<a href=https://github.com/catro/ rel="me noopener" class=iconfont title=github target=_blank><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="36" height="36"><path d="M512 12.672c-282.88.0-512 229.248-512 512 0 226.261333 146.688 418.133333 350.08 485.76 25.6 4.821333 34.986667-11.008 34.986667-24.618667.0-12.16-.426667-44.373333-.64-87.04C242.005334 929.664 211.968 830.08 211.968 830.08 188.672 770.986667 155.008 755.2 155.008 755.2c-46.378667-31.744 3.584-31.104 3.584-31.104 51.413333 3.584 78.421333 52.736 78.421333 52.736 45.653333 78.293333 119.850667 55.68 149.12 42.581333 4.608-33.109333 17.792-55.68 32.426667-68.48-113.706667-12.8-233.216-56.832-233.216-253.013333.0-55.893333 19.84-101.546667 52.693333-137.386667-5.76-12.928-23.04-64.981333 4.48-135.509333.0.0 42.88-13.738667 140.8 52.48 40.96-11.392 84.48-17.024 128-17.28 43.52.256 87.04 5.888 128 17.28 97.28-66.218667 140.16-52.48 140.16-52.48 27.52 70.528 10.24 122.581333 5.12 135.509333 32.64 35.84 52.48 81.493333 52.48 137.386667.0 196.693333-119.68 240-233.6 252.586667 17.92 15.36 34.56 46.762667 34.56 94.72.0 68.522667-.64 123.562667-.64 140.202666.0 13.44 8.96 29.44 35.2 24.32C877.44 942.592 1024 750.592 1024 524.672c0-282.752-229.248-512-512-512"/></svg>
+</a>
+<a href=https://catro.me/index.xml rel="noopener alternate" type=application/rss+xml class=iconfont title=rss target=_blank><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30" height="30"><path d="M819.157333 1024C819.157333 574.592 449.408 204.8.0 204.8V0c561.706667.0 1024 462.293333 1024 1024H819.157333zM140.416 743.04a140.8 140.8.0 01140.501333 140.586667A140.928 140.928.0 01140.074667 1024C62.72 1024 0 961.109333.0 883.626667S62.933333 743.082667 140.416 743.04zM678.784 1024h-199.04c0-263.210667-216.533333-479.786667-479.744-479.786667v-199.04c372.352.0 678.784 306.517333 678.784 678.826667z"/></svg>
+</a>
+</div>
+<div class=copyright>
+<span class=power-by>
+Powered by <a class=hexo-link href=https://gohugo.io>Hugo</a>
+</span>
+<span class=division>|</span>
+<span class=theme-info>
+Theme - <a class=theme-link href=https://github.com/xianmin/hugo-theme-jane>Jane</a>
+</span>
+<span class=copyright-year>
+&copy;
+2019 -
+2025
+<span class=heart>
+<i class=iconfont><svg class="icon" viewBox="0 0 1025 1024" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="14" height="14"><path d="M1000.1 247.9c-15.5-37.3-37.6-70.6-65.7-98.9-54.4-54.8-125.8-85-201-85-85.7.0-166 39-221.4 107.4C456.6 103 376.3 64 290.6 64c-75.1.0-146.5 30.4-201.1 85.6-28.2 28.5-50.4 61.9-65.8 99.3-16 38.8-24 79.9-23.6 122.2.7 91.7 40.1 177.2 108.1 234.8 3.1 2.6 6 5.1 8.9 7.8 14.9 13.4 58 52.8 112.6 102.7 93.5 85.5 209.9 191.9 257.5 234.2 7 6.1 15.8 9.5 24.9 9.5 9.2.0 18.1-3.4 24.9-9.5 34.5-30.7 105.8-95.9 181.4-165 74.2-67.8 150.9-138 195.8-178.2 69.5-57.9 109.6-144.4 109.9-237.3.1-42.5-8-83.6-24-122.2z" fill="#8a8a8a"/></svg>
+</i>
+</span><span class=author>
+tocatro@gmail.com
+</span></span>
+<span id=busuanzi_container>
+访客数/访问量：<span id=busuanzi_value_site_uv></span>/<span id=busuanzi_value_site_pv></span>
+</span>
+</div>
+</footer>
+<div class=back-to-top id=back-to-top>
+<i class=iconfont><svg class="icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="35" height="35"><path d="M510.866688 227.694839 95.449397 629.218702h235.761562L329.15309 958.01517h362.40389L691.55698 628.188232l241.942331-3.089361L510.866688 227.694839zM63.840492 63.962777h894.052392v131.813095H63.840492V63.962777zm0 0"/></svg>
+</i>
+</div>
+</div>
+<script type=text/javascript src=/lib/jquery/jquery-3.2.1.min.js></script>
+<script type=text/javascript src=/lib/slideout/slideout-1.0.1.min.js></script>
+<script type=text/javascript src=/js/main.638251f4230630f0335d8c6748e53a96f94b72670920b60c09a56fdc8bece214.js integrity="sha256-Y4JR9CMGMPAzXYxnSOU6lvlLcmcJILYMCaVv3Ivs4hQ=" crossorigin=anonymous></script>
+<script async src=//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js></script>
+</body>
+</html>
